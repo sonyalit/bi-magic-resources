@@ -2,7 +2,7 @@ import React from "react";
 import cn from 'classnames';
 import ReactECharts from 'echarts-for-react';
 import { MyService } from "../services/MyService";
-import { UrlState } from "bi-internal/core";
+import { urlState, UrlState } from "bi-internal/core";
 
 export default class MyBarGraph extends React.Component<any> {
   private _myService: MyService;
@@ -31,15 +31,13 @@ export default class MyBarGraph extends React.Component<any> {
     const koob = cfg.getRaw().dataSource?.koob;
     this._myService = MyService.createInstance(koob);
     this._myService.subscribeUpdatesAndNotify(this._onSvcUpdated);
-    this._urlService= UrlState.getInstance()
-     this._urlService.subscribeUpdatesAndNotify(this._onSrvcUpdated)
+    this._urlService = UrlState.getInstance()
+    this._urlService.subscribeUpdatesAndNotify(this._onSrvcUpdated)
   }
   private _onSrvcUpdated = (model) => {
     if (model.loading || model.error) return;
-    console.log(model)
     if (model.hasOwnProperty('table')) {
-      this.setState({ table: model.table })
-
+      this.setState({ table: !!model.table })
     }
     //  тут логика, где вы из модели урла берете ключ, который вы выставляете по клику на элемент (таб переклбючения). Допустим он зовется viewType и принимает 0 или 1 (график и таблица соответственно, по умолчанию 0, если не выставлен)
     // сохраняете это в стейт вашего компонента
@@ -64,9 +62,7 @@ export default class MyBarGraph extends React.Component<any> {
     })
   }
   public handleAlternative() {
-    this._urlService.updateModel({table:!this.state.table})
-  //
-    
+    this._urlService.navigate({ table: String(!this.state.table) })
   }
   public render() {
     this.state.option = {
