@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>window.Promise || document.write('<scr'+'ipt src="es6-promise.auto.js"></sc'+'ript>');</script>
+  <script src="bixel.js"></script>
+</head>
+<body>
+<main>
+  <div id="container">
+    <svg id="bar" >
+    </svg>
+  </div>
+  <div id="legend"></div>
+</main>
+
+<script>
+  let dashlet, xs, ys, z, config, data, axes, vs, X, Y;
+  let colors = [
+    "#E59866",
+    "#F8C471",
+    "#F7DC6F",
+    "#82E0AA",
+    "#73C6B6",
+    "#85C1E9",
+    "#BB8FCE",
+    "#F1948A",
+    "#B2BABB"
+  ];
+  bixel.init({
+    zsCount: 1,
+  }).then(function (dashlet_) {
+    dashlet = dashlet_;
+    config = dashlet_.config || {};
+  });
+
+  function getStyle(axisId, memberId) {
+    const config = dashlet.config;
+    const dataSource = config.dataSource || {};
+    const style = dataSource.style || {};
+    const axisStyle = style[axisId] || {};
+    const memberStyle = axisStyle[memberId] || {};
+    return memberStyle;
+  }
+
+  bixel.on('load', function (d, a) {
+    console.log('LOAD');
+    data = d;
+    axes = a;
+    
+    xs = axes.getXs();
+    ys = axes.getYs();
+    z = axes.getZs()[0];
+    X = xs[0];
+    Y = ys[0];
+    // Пример получения данных метрик
+    vs =  xs.map(x => ys.map(y => data.getValue(x, y, z).valueOf()));
+    console.log('1', xs)
+    console.log('2', ys)
+    console.log('3', vs)
+
+
+    // основная функция для рендера графика
+    document.getElementById('bar').innerHTML=''
+    document.getElementById('legend').innerHTML=''
+    render(vs,ys,colors);
+  });
+
+  bixel.on('loading', function (axes) {
+    console.log(axes);
+  });
+
+  bixel.on('no-data', function (axes) {
+    console.log(axes);
+  });
+
+  function render(data,legend,colors) {
+const arr=data[0]
+const svgWidth = 500, svgHeight = 300, barPadding = 5;
+const barWidth = (svgWidth / arr.length);
+
+const svg = document.getElementById('bar');
+svg.setAttribute("width", svgWidth);
+svg.setAttribute("height", svgHeight);
+const legendElements = document.getElementById('legend');
+if(arr.length===1&&legend.length===1){
+  document.getElementById('container').innerHTML='нет данных'
+  return
+}
+legend.forEach((element,id)=>{
+const legendElem = document.createElement('span')
+const legendText = document.createElement('span')
+legendText.innerText=element.title
+const legendColor = document.createElement('div')
+
+legendColor.setAttribute('style',`width:10px;height:10px;border-radius:50%; background-color:${colors[id]};display:inline-block`)
+
+legendElem.appendChild(legendText)
+legendElem.appendChild(legendColor)
+legendElements.appendChild(legendElem)
+}
+)
+
+for(let i = 0; i < arr.length; i++){
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
+    rect.setAttribute("y", Math.round(svgHeight-arr[i]/10000))
+    rect.setAttribute("height", Math.round(svgHeight-arr[i]/10000))
+    rect.setAttribute("width", barWidth-barPadding)
+    const title = document.createElementNS("http://www.w3.org/2000/svg", 'title')
+    title.innerHTML = legend[i].title
+    rect.appendChild(title)
+    rect.setAttribute("style", `fill:${colors[i]}`)
+    const translate = [barWidth * i, 0]
+    rect.setAttribute("transform", "translate("+ translate +")")
+    svg.appendChild(rect)
+}
+  }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
